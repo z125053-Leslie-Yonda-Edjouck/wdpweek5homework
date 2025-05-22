@@ -1,6 +1,8 @@
 let questions = [];
 let currentQuestionIndex = 0;
 let score = 0;
+let timeLeft = 30;
+let timerId;
 
 const questionText = document.getElementById("question");
 const optionsContainer = document.getElementById("options");
@@ -14,13 +16,30 @@ fetch("questions.json")
     showQuestion();
   });
 
+function startTimer() {
+  timeLeft = 30;
+  const timerElement = document.createElement("div");
+  timerElement.id = "timer";
+  timerElement.textContent = `Temps restant : ${timeLeft}s`;
+  document.querySelector(".quiz-box").insertBefore(timerElement, optionsContainer);
+  timerId = setInterval(() => {
+    timeLeft--;
+    timerElement.textContent = `Temps restant : ${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(timerId);
+      checkAnswer(-1);
+    }
+  }, 1000);
+}
+
 function showQuestion() {
+  clearInterval(timerId);
   clearOptions();
   document.getElementById("question-count").textContent =
     `Question ${currentQuestionIndex + 1} of ${questions.length}`;
   const q = questions[currentQuestionIndex];
   questionText.textContent = q.question;
-
+  startTimer();
   q.options.forEach((option, index) => {
     const button = document.createElement("button");
     button.textContent = option;
@@ -31,6 +50,7 @@ function showQuestion() {
 }
 
 function checkAnswer(selectedIndex) {
+  clearInterval(timerId);
   const correct = questions[currentQuestionIndex].answer;
   if (selectedIndex === correct) {
     score++;
@@ -46,6 +66,8 @@ function checkAnswer(selectedIndex) {
 function clearOptions() {
   optionsContainer.innerHTML = "";
   nextBtn.disabled = true;
+  const timerElement = document.getElementById("timer");
+  if (timerElement) timerElement.remove();
 }
 
 nextBtn.addEventListener("click", () => {
@@ -55,6 +77,12 @@ nextBtn.addEventListener("click", () => {
   } else {
     showResult();
   }
+});
+
+function showResult() {
+  clearInterval(timerId);
+  document.querySelector(".quiz-box").innerHTML = `<h2>Your score: ${score} / ${questions.length}</h2>`;
+}
 });
 
 function showResult() {
