@@ -83,8 +83,4 @@ function showResult() {
   clearInterval(timerId);
   document.querySelector(".quiz-box").innerHTML = `<h2>Your score: ${score} / ${questions.length}</h2>`;
 }
-});
-
-function showResult() {
-  document.querySelector(".quiz-box").innerHTML = `<h2>Your score: ${score} / ${questions.length}</h2>`;
-}
+ 
